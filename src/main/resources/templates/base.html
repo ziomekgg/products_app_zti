@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Moja Aplikacja Produktów</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.tailwindcss.com"></script> </head>
+<body class="bg-gray-100">
+<nav class="bg-white shadow-lg p-4 mb-6">
+    <div class="container mx-auto flex justify-between">
+        <a th:href="@{/}" class="text-xl font-bold text-blue-600">Sklep</a>
+        <div>
+            <a th:href="@{/product}" class="px-4">Produkty</a>
+            <a th:href="@{/login}" class="px-4 text-gray-600">Zaloguj</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container mx-auto">
+    <div th:insert="~{this :: content}"></div>
+</main>
+</body>
+</html>

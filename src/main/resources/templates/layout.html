@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="main-layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <title>Hardware Store - MODUŁ STEROWANIA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@heroicons/web@2.0.18/dist/heroicons.min.js"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+<div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex space-x-4">
+            <span>Status: <span class="text-green-500 font-bold">ONLINE</span></span>
+            <span>Baza: <span class="text-indigo-400">H2/PostgreSQL</span></span>
+        </div>
+        <div class="flex space-x-4">
+            <a href="#" class="hover:text-white">Moje Konto</a>
+            <a href="#" class="hover:text-white text-red-400">Wyloguj</a>
+        </div>
+    </div>
+</div>
+
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-8">
+            <a th:href="@{/product}" class="text-2xl font-black text-indigo-600 tracking-tighter">
+                HARDWARE<span class="text-gray-900">STORE</span>
+            </a>
+            <div class="hidden md:flex space-x-6 font-semibold text-gray-600">
+                <a th:href="@{/product}" class="hover:text-indigo-600 transition">Produkty</a>
+                <a th:href="@{/admin/category}" class="hover:text-indigo-600 transition">Kategorie</a>
+                <a href="#" class="hover:text-indigo-600 transition">Rezerwacje</a>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <form action="#" method="GET" class="relative hidden lg:block">
+                <input type="text" placeholder="Szukaj części..." class="bg-gray-100 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64">
+                <div class="absolute left-3 top-2.5 text-gray-400">🔍</div>
+            </form>
+
+            <div class="flex items-center space-x-4">
+                <form th:action="@{/product/search}" method="GET" class="relative hidden lg:block">
+                    <input type="text" name="query" placeholder="Szukaj części..." class="bg-gray-100 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64">
+                    <div class="absolute left-3 top-2.5 text-gray-400">🔍</div>
+                </form>
+
+                <a href="#" class="relative p-2 text-gray-400 hover:text-red-500 transition" title="Ulubione">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+                    </svg>
+                    <span class="absolute top-0 right-0 bg-red-500 text-white text-[10px] rounded-full px-1 font-bold min-w-[16px] h-4 flex items-center justify-center">0</span>
+                </a>
+
+                <a href="#" class="relative p-2 bg-indigo-50 rounded-full text-indigo-600 hover:bg-indigo-100 transition" title="Koszyk">
+                    <span class="text-xl">🛒</span>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1.5 font-bold h-4 flex items-center justify-center">0</span>
+                </a>
+
+                <a th:href="@{/admin/product}" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
+                    Admin
+                </a>
+            </div>
+
+            <a th:href="@{/admin/product}" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
+                Admin
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 mt-4" th:if="${success}">
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm flex justify-between">
+        <span th:text="${success}">Operacja zakończona sukcesem!</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    </div>
+</div>
+<div class="max-w-7xl mx-auto px-4 mt-4" th:if="${error}">
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm flex justify-between">
+        <span th:text="${error}">Wystąpił błąd!</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    </div>
+</div>
+
+<main class="flex-grow py-8">
+    <div th:replace="${content}"></div>
+</main>
+
+<footer class="bg-gray-900 text-gray-500 py-12 mt-12">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+            <h3 class="text-white font-bold mb-4">Hardware Store</h3>
+            <p class="text-sm text-gray-400">System zarządzania częściami - wersja Spring Boot 3.x</p>
+        </div>
+        <div>
+            <h3 class="text-white font-bold mb-4">Szybkie linki</h3>
+            <ul class="text-sm space-y-2">
+                <li><a th:href="@{/admin/product}" class="hover:text-white">Zarządzaj produktami</a></li>
+                <li><a th:href="@{/admin/category}" class="hover:text-white">Zarządzaj kategoriami</a></li>
+            </ul>
+        </div>
+        <div class="text-right text-xs">
+            <p>Zbudowano na skalpelu Spring Boota.</p>
+            <p class="mt-2">2026 &copy; MODUŁ STEROWANIA</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

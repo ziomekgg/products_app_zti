@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${product.name}">Szczegóły produktu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-md p-4 mb-8">
+  <div class="container mx-auto">
+    <a th:href="@{/product}" class="text-indigo-600 hover:underline">← Powrót do listy</a>
+  </div>
+</nav>
+
+<div class="container mx-auto px-4">
+  <div class="bg-white rounded-2xl shadow-lg overflow-hidden max-w-4xl mx-auto flex flex-col md:flex-row">
+    <div class="md:w-1/2 bg-gray-200 flex items-center justify-center h-64 md:h-auto">
+      <span class="text-gray-400">Brak zdjęcia produktu</span>
+    </div>
+
+    <div class="p-8 md:w-1/2">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4" th:text="${product.name}">Nazwa</h1>
+      <p class="text-2xl font-semibold text-indigo-600 mb-6" th:text="${product.price} + ' PLN'">0.00</p>
+
+      <div class="prose prose-indigo mb-8">
+        <p th:text="${product.description}" class="text-gray-700">Opis produktu...</p>
+      </div>
+
+      <div class="border-t border-b py-4 mb-8 flex justify-between items-center">
+        <span class="text-gray-500 font-medium">Dostępność:</span>
+        <span th:class="${product.stockQuantity > 0} ? 'text-green-600 font-bold' : 'text-red-600 font-bold'"
+              th:text="${product.stockQuantity} + ' sztuk'">0</span>
+      </div>
+
+      <div th:if="${product.stockQuantity > 0}" class="bg-indigo-50 p-6 rounded-xl">
+        <h3 class="text-indigo-900 font-bold mb-4 text-sm uppercase tracking-wider">Zarezerwuj produkt</h3>
+        <form th:action="@{/reservation/make/{id}(id=${product.id})}" method="post" class="flex gap-2">
+          <input type="number" name="quantity" value="1" min="1" th:max="${product.stockQuantity}"
+                 class="w-20 rounded-lg border-gray-300 p-2 text-center">
+          <button type="submit" class="flex-grow bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition">
+            Rezerwuj teraz
+          </button>
+        </form>
+      </div>
+
+      <div th:unless="${product.stockQuantity > 0}" class="bg-red-50 p-4 rounded-xl text-red-700 text-center font-bold">
+        Produkt obecnie niedostępny
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

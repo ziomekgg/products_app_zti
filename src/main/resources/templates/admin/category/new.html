@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Nowa Kategoria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+  <h1 class="text-2xl font-bold mb-6 text-gray-800">Dodaj nową kategorię</h1>
+  <form th:action="@{/admin/category/new}" method="post" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Nazwa kategorii</label>
+      <input type="text" name="name" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="np. Elektronika" required>
+    </div>
+    <div class="flex gap-4 pt-4">
+      <a th:href="@{/templates/admin/category}" class="flex-1 text-center py-3 text-gray-500 hover:bg-gray-50 rounded-lg transition">Anuluj</a>
+      <button type="submit" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 shadow-md transition">Zapisz</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>
