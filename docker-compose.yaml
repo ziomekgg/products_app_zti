@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:15
+    container_name: hardware_store_db
+    restart: always
+    environment:
+      POSTGRES_DB: products_app
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
