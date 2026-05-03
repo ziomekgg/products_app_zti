@@ -70,6 +70,7 @@ public class AdminProductController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Long id, Model model) {
         Product product = productRepository.findById(id).orElseThrow();
+        product.getImages().size();
         model.addAttribute("product", product);
         model.addAttribute("categories", categoryRepository.findAll());
         return "admin/product/edit";
@@ -136,20 +137,23 @@ public class AdminProductController {
 
         return "redirect:/admin/product/" + id + "/edit";
     }
-    @PostMapping("/{id}/delete-image")
-    public String deleteImage(@PathVariable Long id) {
-        Product product = productRepository.findById(id).orElseThrow();
+    // UWAGA: Ścieżka musi się zgadzać z tym, co jest w th:action w HTML!
+    @PostMapping("/image/delete/{imageId}")
+    public String deleteSpecificImage(@PathVariable Long imageId) {
+        // 1. Znajdujemy zdjęcie w MODULE MOCY
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zdjęcia o ID: " + imageId));
 
-        // Usuwamy fizyczny plik z folderu uploads
-        if (product.getImageUrl() != null) {
-            fileStorageService.deleteFile(product.getImageUrl());
-        }
+        Long productId = image.getProduct().getId();
 
-        // Czyścimy wpis w bazie danych
-        product.setImageUrl(null);
-        productRepository.save(product);
+        // 2. Usuwamy fizyczny plik z dysku
+        fileStorageService.deleteFile(image.getUrl());
 
-        return "redirect:/admin/product/" + id + "/edit";
+        // 3. Usuwamy rekord z bazy danych
+        imageRepository.delete(image);
+
+        // 4. Wracamy do edycji tego konkretnego produktu
+        return "redirect:/admin/product/" + productId + "/edit";
     }
 
     @PostMapping("/image/set-main/{imageId}")
