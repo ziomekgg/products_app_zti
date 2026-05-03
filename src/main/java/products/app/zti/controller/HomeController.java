@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String index() {
-        return "home/index"; // odpowiednik Twojej strony powitalnej
+    public String home() {
+        return "home"; // Zwraca plik home.html z folderu templates
     }
 }

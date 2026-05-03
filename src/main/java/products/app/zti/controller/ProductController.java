@@ -44,4 +44,5 @@ public class ProductController {
         // Na razie zostawiamy redirect, żeby przycisk nie wywalał błędu 404
         return "redirect:/product/" + id;
     }
+
 }
