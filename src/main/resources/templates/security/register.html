@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+
+<main class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+  <div class="max-w-md w-full">
+    <div class="bg-white p-10 md:p-12 rounded-[3rem] border border-gray-100 shadow-2xl shadow-indigo-100/50">
+
+      <header class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-50 rounded-3xl mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </div>
+        <h2 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-2">Rejestracja</h2>
+        <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Tworzenie profilu operatora</p>
+      </header>
+
+      <!-- ALERT BŁĘDU (np. email zajęty) -->
+      <div th:if="${error}" class="mb-8 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-center text-xs font-black uppercase tracking-widest">
+        <span th:text="${error}">Błąd rejestracji</span>
+      </div>
+
+      <form th:action="@{/register}" th:object="${user}" method="post" class="space-y-6">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2 tracking-widest">Email (Login)</label>
+          <input type="email" th:field="*{email}" placeholder="nowy@operator.pl"
+                 class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold text-gray-700 transition-all" required>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2 tracking-widest">Klucz dostępu (Hasło)</label>
+          <div class="relative">
+            <input type="password" id="regPassword" th:field="*{password}" placeholder="••••••••"
+                   class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold text-gray-700 transition-all" required>
+            <button type="button" onclick="toggleRegPassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
+              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gray-900 text-white font-black py-5 rounded-[1.5rem] uppercase text-[11px] tracking-[0.2em] hover:bg-green-600 transition-all active:scale-95 shadow-xl shadow-green-100">
+          Utwórz konto
+        </button>
+      </form>
+
+      <footer class="mt-10 pt-8 border-t border-gray-50 text-center">
+        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4">Masz już profil?</p>
+        <a th:href="@{/login}" class="text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-gray-900 transition-colors">
+          Zaloguj się do bazy
+        </a>
+      </footer>
+    </div>
+  </div>
+</main>
+
+<script>
+  function toggleRegPassword() {
+    const input = document.getElementById('regPassword');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.add('text-indigo-600');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('text-indigo-600');
+    }
+  }
+</script>
+
+</body>
+</html>

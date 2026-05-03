@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-4xl mx-auto px-4 py-20 flex flex-col items-center text-center">
+  <div class="w-20 h-20 bg-indigo-50 rounded-[2rem] flex items-center justify-center text-indigo-600 mb-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.443 1.103m-3.13 0a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" />
+    </svg>
+  </div>
+  <h1 class="text-5xl font-black text-gray-900 uppercase tracking-tighter mb-6">FAQ</h1>
+  <p class="text-2xl font-bold text-gray-400 italic">"Kto pyta nie błądzi, niestety jeszcze nikt nie pytał..."</p>
+  <div class="mt-12 w-full h-px bg-gray-100"></div>
+  <a th:href="@{/}" class="mt-12 bg-gray-900 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-indigo-600 transition-all">Powrót do bazy</a>
+</main>
+</body>
+</html>

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="main-layout(content)" lang="pl">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="main-layout(content)" lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,11 +19,29 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex space-x-4">
             <span>Status: <span class="text-green-500 font-bold">ONLINE</span></span>
-            <span>Baza: <span class="text-indigo-400 font-semibold uppercase">PostgreSQL</span></span>
         </div>
+
         <div class="flex space-x-4 uppercase font-bold text-[10px]">
-            <a href="#" class="hover:text-white transition">Moje Konto</a>
-            <a href="#" class="hover:text-white text-red-400 transition">Wyloguj</a>
+            <!-- WIDOCZNE TYLKO DLA ZALOGOWANYCH -->
+            <th:block sec:authorize="isAuthenticated()">
+                <!-- MOJE KONTO (Nowa ikona) -->
+                <a th:href="@{/profile}" class="text-gray-700 hover:text-indigo-600 transition" title="Moje Konto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit"
+                            class="hover:text-white text-red-400 transition uppercase font-bold text-[10px] bg-transparent border-none p-0 cursor-pointer">
+                        Wyloguj
+                    </button>
+                </form>
+            </th:block>
+
+            <!-- WIDOCZNE TYLKO DLA NIEZALOGOWANYCH -->
+            <th:block sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="hover:text-white text-indigo-400 transition">Zaloguj się</a>
+            </th:block>
         </div>
     </div>
 </div>
@@ -30,7 +50,6 @@
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-8">
-            <!-- LOGO: Teraz prowadzi do Home (/) -->
             <a th:href="@{/}" class="text-2xl font-black text-indigo-600 tracking-tighter uppercase">
                 HARDWARE<span class="text-gray-900">STORE</span>
             </a>
@@ -52,7 +71,6 @@
             </form>
 
             <div class="flex items-center space-x-4">
-                <!-- IKONY SVG -->
                 <a href="#" class="text-gray-400 hover:text-red-500 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -63,7 +81,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </a>
-                <a th:href="@{/admin/product}" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100">
+
+                <!-- PANEL ADMINA TYLKO DLA ROLI ADMIN -->
+                <a th:href="@{/admin/product}"
+                   sec:authorize="hasRole('ADMIN')"
+                   class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100">
                     Admin
                 </a>
             </div>
@@ -71,15 +93,54 @@
     </div>
 </nav>
 
-<!-- CONTENT AREA: To jest punkt wpięcia dla KAŻDEJ strony -->
 <main class="flex-grow py-8">
     <div th:replace="${content}"></div>
 </main>
 
-<footer class="bg-gray-900 text-gray-500 py-12 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 text-center md:text-left flex justify-between items-center">
-        <span class="text-white font-black uppercase tracking-tighter">Hardware Store</span>
-        <span class="text-[10px] uppercase font-bold tracking-widest text-gray-600">2026 &copy; MODUŁ STEROWANIA</span>
+<footer class="bg-gray-900 text-gray-500 py-16 mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- GÓRNA CZĘŚĆ STOPKI -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 border-b border-gray-800 pb-12">
+
+            <!-- KOLUMNA 1: BRANDING -->
+            <div class="flex flex-col space-y-4">
+                <span class="text-white font-black uppercase tracking-tighter text-2xl">
+                    HARDWARE<span class="text-indigo-500">STORE</span>
+                </span>
+                <p class="text-xs font-medium leading-relaxed max-w-xs">
+                    Profesjonalne komponenty dla Twojego ekosystemu. Precyzja w każdym bicie danych.
+                </p>
+            </div>
+
+            <!-- KOLUMNA 2: FORMALNOŚCI -->
+            <div class="flex flex-col space-y-3">
+                <span class="text-white text-[10px] font-black uppercase tracking-[0.2em] mb-2">Dokumentacja</span>
+                <a th:href="@{/regulamin}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Regulamin Sklepu</a>
+                <a th:href="@{/polityka-prywatnosci}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Polityka Prywatności</a>
+                <a th:href="@{/cookies}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Pliki Cookies</a>
+            </div>
+
+            <!-- KOLUMNA 3: WSPARCIE -->
+            <div class="flex flex-col space-y-3">
+                <span class="text-white text-[10px] font-black uppercase tracking-[0.2em] mb-2">Wsparcie Techniczne</span>
+                <a th:href="@{/kontakt}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Kontakt</a>
+                <a th:href="@{/reklamacje}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Reklamacje i Zwroty</a>
+                <a th:href="@{/faq}" class="hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">Częste Pytania</a>
+            </div>
+        </div>
+
+        <!-- DOLNA CZĘŚĆ STOPKI -->
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-gray-600">
+                    Wszystkie układy sprawne
+                </span>
+            </div>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-gray-600">
+                2026 &copy; <span class="text-gray-400">MODUŁ STEROWANIA</span>
+            </span>
+        </div>
     </div>
 </footer>
 

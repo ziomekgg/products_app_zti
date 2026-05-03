@@ -1,0 +1,83 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-4xl mx-auto px-4 py-12">
+  <header class="mb-12">
+    <h1 class="text-4xl font-black text-gray-900 uppercase tracking-tighter">Zarządzanie Kontem</h1>
+  </header>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- SEKCJA ADRESU EMAIL -->
+    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+      <h2 class="text-xl font-bold mb-6 flex items-center">
+        <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3 text-sm">@</span>
+        Adres E-mail
+      </h2>
+      <form th:action="@{/profile/update-email}" method="post">
+        <div class="mb-4">
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Aktualny email</label>
+          <input type="email" name="email" th:value="${user.email}"
+                 class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold">
+        </div>
+        <button type="submit" class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all">
+          Zapisz e-mail
+        </button>
+      </form>
+    </div>
+
+    <!-- SEKCJA HASŁA -->
+    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+      <h2 class="text-xl font-bold mb-6 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Zabezpieczenia
+      </h2>
+      <form th:action="@{/profile/update-password}" method="post">
+        <div class="mb-4">
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Nowe hasło</label>
+          <!-- RELATIVE CONTAINER DLA IKONY -->
+          <div class="relative">
+            <input type="password" id="newPassword" name="newPassword" placeholder="••••••••"
+                   class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold text-gray-700 transition-all">
+
+            <!-- PRZYCISK POKAŻ/UKRYJ -->
+            <button type="button" onclick="togglePassword()"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
+              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Ikona oka (domyślnie zamknięte) -->
+                <path id="eyePath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-red-500 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-red-600 transition-all active:scale-95">
+          Zmień hasło
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('newPassword');
+      const eyeIcon = document.getElementById('eyeIcon');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.add('text-indigo-600');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('text-indigo-600');
+      }
+    }
+  </script>
+
+  <!-- POWIADOMIENIE -->
+  <div th:if="${param.success}" class="mt-8 p-4 bg-green-50 text-green-700 rounded-2xl text-center font-bold text-sm">
+    Zmiany w Module Sterowania zostały zapisane pomyślnie!
+  </div>
+</main>
+</body>
+</html>

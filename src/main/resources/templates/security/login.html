@@ -1,31 +1,86 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Logowanie</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg shadow-lg">
-  <h2 class="text-2xl font-bold mb-6 text-center">Logowanie</h2>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: main-layout(~{::main})}">
+<body>
 
-  <div th:if="${param.error}" class="bg-red-100 text-red-700 p-2 rounded mb-4 text-center">
-    Błędny email lub hasło
+<main class="min-h-[70vh] flex items-center justify-center px-4">
+  <div class="max-w-md w-full">
+
+    <!-- KARTA LOGOWANIA -->
+    <div class="bg-white p-10 md:p-12 rounded-[3rem] border border-gray-100 shadow-2xl shadow-indigo-100/50">
+
+      <header class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 rounded-3xl mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h2 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-2">Logowanie</h2>
+        <p class="text-gray-400 font-medium text-sm uppercase tracking-widest">Twoje konto HARDWARESTORE</p>
+      </header>
+
+      <!-- ALERT BŁĘDU -->
+      <div th:if="${param.error}" class="mb-8 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-center text-xs font-black uppercase tracking-widest animate-shake">
+        Błędny email lub hasło dostępu
+      </div>
+
+      <!-- FORMULARZ -->
+      <form th:action="@{/login}" method="post" class="space-y-6">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2 tracking-widest">Identyfikator (Email)</label>
+          <input type="text" name="username" placeholder="operator@hardware.store"
+                 class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold text-gray-700 transition-all placeholder:text-gray-300" required>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2 tracking-widest">Klucz dostępu (Hasło)</label>
+          <div class="relative">
+            <input type="password" id="loginPassword" name="password" placeholder="••••••••"
+                   class="w-full bg-gray-50 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-indigo-500 font-bold text-gray-700 transition-all placeholder:text-gray-300" required>
+
+            <!-- PRZYCISK POKAŻ/UKRYJ -->
+            <button type="button" onclick="toggleLoginPassword()"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
+              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <script>
+          function toggleLoginPassword() {
+            const passwordInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              eyeIcon.classList.add('text-indigo-600');
+              eyeIcon.classList.remove('text-gray-400');
+            } else {
+              passwordInput.type = 'password';
+              eyeIcon.classList.remove('text-indigo-600');
+              eyeIcon.classList.add('text-gray-400');
+            }
+          }
+        </script>
+
+        <button type="submit" class="w-full bg-gray-900 text-white font-black py-5 rounded-[1.5rem] uppercase text-[11px] tracking-[0.2em] hover:bg-indigo-600 transition-all active:scale-95 shadow-xl shadow-indigo-100">
+          Zaloguj się
+        </button>
+      </form>
+
+      <!-- STOPKA KARTY -->
+      <footer class="mt-10 pt-8 border-t border-gray-50 text-center">
+        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4">Nie masz konta?</p>
+        <a th:href="@{/register}" class="inline-block text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-gray-900 transition-colors">
+          Zarejestruj się
+        </a>
+      </footer>
+    </div>
   </div>
+</main>
 
-  <form th:action="@{/login}" method="post" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Email</label>
-      <input type="text" name="username" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Hasło</label>
-      <input type="password" name="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
-    </div>
-    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition">
-      Zaloguj się
-    </button>
-  </form>
-</div>
 </body>
 </html>
