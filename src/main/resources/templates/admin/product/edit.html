@@ -12,7 +12,7 @@
     <a th:href="@{/admin/product}" class="text-gray-500 hover:underline text-sm">Anuluj</a>
   </div>
 
-  <form th:action="@{/admin/product/{id}/edit(id=${product.id})}" th:object="${product}" method="post" class="space-y-4">
+  <form th:action="@{/admin/product/{id}/edit(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data" class="space-y-4">
 
     <div>
       <label class="block text-sm font-medium text-gray-700">Nazwa produktu</label>
@@ -40,12 +40,30 @@
     </div>
 
     <div>
+      <label class="block text-sm font-medium text-gray-700">Aktualne zdjęcie</label>
+      <div class="mt-2 mb-4">
+        <!-- Wyświetlamy stare zdjęcie, jeśli produkt je posiada -->
+        <img th:if="${product.imageUrl}"
+             th:src="@{'/uploads/' + ${product.imageUrl}}"
+             alt="Podgląd"
+             class="w-32 h-32 object-cover rounded-lg border shadow-sm">
+        <p th:unless="${product.imageUrl}" class="text-gray-400 italic text-sm">Brak zdjęcia</p>
+      </div>
+
+      <label class="block text-sm font-medium text-gray-700">Zmień zdjęcie (opcjonalnie)</label>
+      <!-- 2. Dodaj input dla pliku o nazwie "file" -->
+      <input type="file" name="file" accept="image/*"
+             class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+      <p class="text-xs text-gray-500 mt-1">Pozostaw puste, aby zachować obecne zdjęcie.</p>
+    </div>
+
+    <div>
       <label class="block text-sm font-medium text-gray-700">Opis</label>
       <textarea th:field="*{description}" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"></textarea>
     </div>
 
     <div class="pt-4">
-      <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition shadow-lg">
+      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
         Zapisz zmiany
       </button>
     </div>
