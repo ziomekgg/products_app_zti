@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardware Store | Najlepsza Elektronika</title>
+    <title>Hardware Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -16,34 +16,34 @@
 <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex space-x-4">
-            <span>Status: <span class="text-green-500 font-bold uppercase tracking-wider">Online</span></span>
-            <span>Baza: <span class="text-indigo-400 font-semibold">PostgreSQL</span></span>
+            <span>Status: <span class="text-green-500 font-bold">ONLINE</span></span>
+            <span>Baza: <span class="text-indigo-400 font-semibold uppercase">PostgreSQL</span></span>
         </div>
-        <div class="flex space-x-4">
-            <a href="#" class="hover:text-white transition text-xs">Moje Konto</a>
-            <a href="#" class="hover:text-white text-red-400 transition font-bold uppercase text-[10px]">Wyloguj</a>
+        <div class="flex space-x-4 uppercase font-bold text-[10px]">
+            <a href="#" class="hover:text-white transition">Moje Konto</a>
+            <a href="#" class="hover:text-white text-red-400 transition">Wyloguj</a>
         </div>
     </div>
 </div>
 
-<!-- GŁÓWNA NAWIGACJA -->
+<!-- NAWIGACJA -->
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-8">
+            <!-- LOGO: Teraz prowadzi do Home (/) -->
             <a th:href="@{/}" class="text-2xl font-black text-indigo-600 tracking-tighter uppercase">
                 HARDWARE<span class="text-gray-900">STORE</span>
             </a>
-            <div class="hidden md:flex space-x-6 font-semibold text-sm text-gray-600 uppercase tracking-wider">
+            <div class="hidden md:flex space-x-6 font-bold text-gray-500 uppercase text-[11px] tracking-widest">
                 <a th:href="@{/product}" class="hover:text-indigo-600 transition">Produkty</a>
                 <a th:href="@{/admin/category}" class="hover:text-indigo-600 transition">Kategorie</a>
             </div>
         </div>
 
         <div class="flex items-center space-x-6">
-            <!-- WYSZUKIWARKA -->
             <form th:action="@{/product/search}" method="GET" class="relative hidden lg:block">
                 <input type="text" name="query" placeholder="Szukaj części..."
-                       class="bg-gray-100 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 border border-transparent focus:bg-white transition-all shadow-inner">
+                       class="bg-gray-100 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 border-transparent focus:bg-white transition-all">
                 <div class="absolute left-3 top-2.5 text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -52,32 +52,18 @@
             </form>
 
             <div class="flex items-center space-x-4">
-                <!-- ULUBIONE -->
-                <a href="#" class="relative p-1 text-gray-400 hover:text-red-500 transition group" title="Ulubione">
+                <!-- IKONY SVG -->
+                <a href="#" class="text-gray-400 hover:text-red-500 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1.5 font-bold min-w-[16px] h-4 flex items-center justify-center">0</span>
                 </a>
-
-                <!-- KOSZYK -->
-                <a href="#" class="relative p-1 text-gray-700 hover:text-indigo-600 transition group" title="Koszyk">
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <span class="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] rounded-full px-1.5 font-bold h-4 flex items-center justify-center">0</span>
                 </a>
-
-                <!-- PROFIL -->
-                <a href="#" class="text-gray-400 hover:text-indigo-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </a>
-
-                <!-- ADMIN -->
-                <a th:href="@{/admin/product}"
-                   class="ml-2 bg-indigo-600 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95">
+                <a th:href="@{/admin/product}" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100">
                     Admin
                 </a>
             </div>
@@ -85,27 +71,15 @@
     </div>
 </nav>
 
-<!-- PUNKT WSTRZYKNIĘCIA TREŚCI -->
-<!-- To jest najważniejsza linia. Tutaj layout wstawia <main> z Twojego home.html -->
-<div th:replace="${content}">
-    <!-- Domyślna treść (opcjonalna) -->
-</div>
+<!-- CONTENT AREA: To jest punkt wpięcia dla KAŻDEJ strony -->
+<main class="flex-grow py-8">
+    <div th:replace="${content}"></div>
+</main>
 
-<!-- STOPKA -->
-<footer class="bg-gray-900 text-gray-500 py-16 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-        <div>
-            <h3 class="text-white font-black text-xl mb-4 tracking-tighter uppercase">Hardware Store</h3>
-            <p class="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto md:mx-0">Twój zaufany dostawca komponentów komputerowych najwyższej klasy.</p>
-        </div>
-        <div class="flex flex-col gap-2">
-            <h3 class="text-white font-bold mb-4 uppercase text-xs tracking-widest">Nawigacja</h3>
-            <a th:href="@{/product}" class="hover:text-indigo-400 transition text-sm">Produkty</a>
-            <a th:href="@{/admin/product}" class="hover:text-indigo-400 transition text-sm">Panel Zarządzania</a>
-        </div>
-        <div class="flex flex-col justify-end text-xs">
-            <p class="text-gray-300 font-bold uppercase tracking-widest">2026 &copy; Hardware Store</p>
-        </div>
+<footer class="bg-gray-900 text-gray-500 py-12 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center md:text-left flex justify-between items-center">
+        <span class="text-white font-black uppercase tracking-tighter">Hardware Store</span>
+        <span class="text-[10px] uppercase font-bold tracking-widest text-gray-600">2026 &copy; MODUŁ STEROWANIA</span>
     </div>
 </footer>
 

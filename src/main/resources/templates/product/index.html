@@ -1,75 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pl">
 
-<!-- 1. IMPORT HEADER (Podajemy tytuł strony) -->
+<!-- 1. IMPORT HEADERA (Style, Tailwind, Fonty z Modułu Sterowania) -->
 <head th:replace="~{fragments/layout :: header('Nasze Produkty')}"></head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
-<!-- 2. IMPORT NAVBAR -->
+<!-- 2. IMPORT NAVBARA (Logo Hardware Store i nawigacja) -->
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="max-w-7xl mx-auto px-4 pb-20">
+<main class="max-w-7xl mx-auto px-4 pb-20 flex-grow">
 
-  <header class="mb-10">
-    <h1 class="text-4xl font-black text-gray-900 mb-2 tracking-tight">Nasze Produkty</h1>
-    <p class="text-gray-500 font-medium">Przeglądaj ofertę prosto z Twojego Modułu Mocy.</p>
+  <!-- NAGŁÓWEK STRONY -->
+  <header class="mb-12 pt-8">
+    <h1 class="text-5xl font-black text-gray-900 mb-3 tracking-tighter uppercase">Nasze Produkty</h1>
+    <p class="text-gray-500 font-medium text-lg">
+      Wyselekcjonowana elektronika zarządzana przez Twój <span class="text-indigo-600 font-bold uppercase">Moduł Mocy</span>.
+    </p>
   </header>
 
   <!-- GRID PRODUKTÓW -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
 
-    <div th:each="product : ${products}" class="group bg-white rounded-[2.5rem] p-4 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+    <!-- Pętla po produktach -->
+    <div th:each="product : ${products}"
+         class="group bg-white rounded-[3rem] p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 flex flex-col">
 
-      <!-- GALERIA (Logika Płyty z BQ) -->
-      <div class="relative aspect-[4/5] bg-gray-50 rounded-[2rem] overflow-hidden mb-6 shadow-inner">
+      <!-- SEKACJA ZDJĘCIA (Logika Modułu Mocy) -->
+      <div class="relative aspect-[4/5] bg-gray-50 rounded-[2.5rem] overflow-hidden mb-8 shadow-inner">
         <a th:href="@{/product/{id}(id=${product.id})}">
-          <!-- Pętla szukająca obrazka oznaczonego jako Główny w MODULE MOCY -->
+          <!-- Wyświetlanie zdjęcia oznaczonego jako Główne -->
           <th:block th:if="${not #lists.isEmpty(product.images)}">
             <th:block th:each="img : ${product.images}">
-              <img th:if="${img.isMain}" th:src="@{'/uploads/' + ${img.url}}" class="w-full h-full object-contain p-6 group-hover:scale-110 transition duration-500" alt="Produkt">
+              <img th:if="${img.isMain}" th:src="@{'/uploads/' + ${img.url}}"
+                   class="w-full h-full object-contain p-8 group-hover:scale-110 transition duration-700" alt="Produkt">
             </th:block>
-            <!-- Fallback na stare pole tekstowe imageUrl -->
-            <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}" th:src="@{'/uploads/' + ${product.imageUrl}}" class="w-full h-full object-contain p-6" alt="Produkt">
           </th:block>
 
-          <!-- Placeholder jeśli brak jakichkolwiek zdjęć -->
-          <img th:if="${#lists.isEmpty(product.images) and (product.imageUrl == null or #strings.isEmpty(product.imageUrl))}" src="https://via.placeholder.com/400x500?text=Brak+zdjęcia" class="w-full h-full object-contain p-6" alt="Brak">
+          <!-- Fallback na imageUrl lub Placeholder -->
+          <th:block th:if="${#lists.isEmpty(product.images)}">
+            <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                 th:src="@{'/uploads/' + ${product.imageUrl}}" class="w-full h-full object-contain p-8" alt="Produkt">
+
+            <img th:if="${product.imageUrl == null or #strings.isEmpty(product.imageUrl)}"
+                 src="https://via.placeholder.com/400x500?text=Brak+Zdjecia" class="w-full h-full object-contain p-8 opacity-20" alt="Brak">
+          </th:block>
         </a>
 
-        <span th:if="${product.stockQuantity != null and product.stockQuantity > 0}" class="absolute top-4 left-4 bg-white/90 text-green-600 text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm">DOSTĘPNY</span>
+        <!-- Etykieta dostępności -->
+        <span th:if="${product.stockQuantity != null and product.stockQuantity > 0}"
+              class="absolute top-5 left-5 bg-white/95 text-green-600 text-[10px] font-black px-4 py-2 rounded-full shadow-sm uppercase tracking-widest">
+                    Dostępny
+                </span>
       </div>
 
-      <!-- DANE (Moduł Sterowania) -->
-      <div class="px-2 flex-grow">
-        <div class="flex justify-between items-start mb-2">
-          <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest" th:text="${product.category != null ? product.category.name : 'Ogólne'}">Kategoria</p>
-          <span class="text-lg font-black text-gray-900" th:text="${product.price} + ' PLN'">0 PLN</span>
+      <!-- DANE PRODUKTU (Logika Modułu Sterowania) -->
+      <div class="px-3 flex-grow">
+        <div class="flex justify-between items-start mb-3">
+          <p class="text-[11px] font-extrabold text-indigo-500 uppercase tracking-[0.2em]"
+             th:text="${product.category != null ? product.category.name : 'Elektronika'}"></p>
+          <span class="text-xl font-black text-gray-900" th:text="${product.price} + ' PLN'"></span>
         </div>
 
-        <h3 class="font-bold text-gray-900 text-xl mb-2 line-clamp-1" th:text="${product.name}">Nazwa Produktu</h3>
-
-        <!-- OPIS (Przywrócony zgodnie z życzeniem) -->
-        <p class="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed" th:text="${product.description}">Krótki opis...</p>
+        <h3 class="font-bold text-gray-900 text-2xl mb-3 line-clamp-1 tracking-tight" th:text="${product.name}"></h3>
+        <p class="text-gray-400 text-sm mb-8 line-clamp-2 leading-relaxed font-medium" th:text="${product.description}"></p>
       </div>
 
+      <!-- PRZYCISK AKCJI -->
       <div class="px-2 pb-2 mt-auto">
-        <a th:href="@{/product/{id}(id=${product.id})}" class="block w-full text-center bg-gray-900 text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-lg active:scale-95">
+        <a th:href="@{/product/{id}(id=${product.id})}"
+           class="block w-full text-center bg-gray-900 text-white font-black py-5 rounded-[1.5rem] hover:bg-indigo-600 transition-all shadow-xl active:scale-95 uppercase text-[11px] tracking-widest">
           Szczegóły produktu
         </a>
       </div>
     </div>
   </div>
 
-  <!-- PUSTY STAN -->
-  <div th:if="${#lists.isEmpty(products)}" class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-    <h2 class="text-xl font-bold text-gray-900 mb-2">Brak produktów w bazie danych.</h2>
-    <a th:href="@{/admin/product/new}" class="text-indigo-600 font-bold hover:underline">Dodaj pierwszy produkt w Panelu Admina</a>
+  <!-- PUSTY STAN (Gdy brak produktów w bazie) -->
+  <div th:if="${#lists.isEmpty(products)}" class="text-center py-32 bg-white rounded-[4rem] border-2 border-dashed border-gray-100 mt-10">
+    <h2 class="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tighter">Baza danych jest pusta</h2>
+    <p class="text-gray-500 mb-8 font-medium">Zasil Moduł Mocy nowymi komponentami w panelu administracyjnym.</p>
+    <a th:href="@{/admin/product/new}" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all">
+      Dodaj pierwszy produkt
+    </a>
   </div>
 
 </main>
 
-<!-- 3. IMPORT FOOTER -->
+<!-- 3. IMPORT FOOTER (Stopka z Modułu Sterowania) -->
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 </body>
