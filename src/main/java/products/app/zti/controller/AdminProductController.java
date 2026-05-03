@@ -67,31 +67,59 @@ public class AdminProductController {
     // USUWANIE (delete)
     @PostMapping("/{id}")
     public String delete(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow();
+
+        if (product.getImageUrl() != null) {
+            fileStorageService.deleteFile(product.getImageUrl());
+        }
+
         productRepository.deleteById(id);
         return "redirect:/admin/product";
     }
 
-    // EDYCJA (edit) - Akcja zapisu
     @PostMapping("/{id}/edit")
     public String update(@PathVariable Long id,
                          @ModelAttribute Product product,
                          @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        // 1. Pobierz aktualną wersję produktu z bazy (MODUŁ MOCY)
+        // 1. Pobierz aktualną wersję produktu z bazy
         Product existingProduct = productRepository.findById(id).orElseThrow();
 
         // 2. Obsługa zdjęcia
         if (file != null && !file.isEmpty()) {
-            String fileName = fileStorageService.storeFile(file);
-            product.setImageUrl(fileName);
+            // USUŃ STARE ZDJĘCIE PRZED ZAPISANIEM NOWEGO
+            if (existingProduct.getImageUrl() != null) {
+                fileStorageService.deleteFile(existingProduct.getImageUrl());
+            }
+
+            String fileName = fileStorageService.storeFile(file); // Zapisz nowy plik na dysku
+            product.setImageUrl(fileName);                        // Ustaw nową nazwę w obiekcie
+
         } else {
-            // Jeśli nie wrzucono nowego pliku, zachowaj starą ścieżkę
+            // Jeśli nie wrzucono nowego pliku, zachowaj starą ścieżkę z bazy
             product.setImageUrl(existingProduct.getImageUrl());
         }
 
+        // Upewniamy się, że ID jest poprawne, aby Hibernate zrobił UPDATE zamiast INSERT
         product.setId(id);
         productRepository.save(product);
+
         return "redirect:/admin/product";
+    }
+    @PostMapping("/{id}/delete-image")
+    public String deleteImage(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow();
+
+        // Usuwamy fizyczny plik z folderu uploads
+        if (product.getImageUrl() != null) {
+            fileStorageService.deleteFile(product.getImageUrl());
+        }
+
+        // Czyścimy wpis w bazie danych
+        product.setImageUrl(null);
+        productRepository.save(product);
+
+        return "redirect:/admin/product/" + id + "/edit";
     }
 
 }

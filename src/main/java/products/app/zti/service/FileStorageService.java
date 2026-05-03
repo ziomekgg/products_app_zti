@@ -5,6 +5,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +30,19 @@ public class FileStorageService {
             return fileName;
         } catch (Exception e) {
             throw new RuntimeException("Nie udało się zapisać pliku!", e);
+        }
+    }
+
+    public void deleteFile(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return;
+        }
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            // Logujemy błąd, ale nie przerywamy działania aplikacji
+            System.err.println("Nie udało się usunąć pliku: " + fileName + ". Błąd: " + e.getMessage());
         }
     }
 }
