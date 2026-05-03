@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import products.app.zti.model.Image;
 import products.app.zti.model.Product;
 import products.app.zti.repository.CategoryRepository;
 import products.app.zti.repository.ProductRepository;
+import products.app.zti.repository.ImageRepository;
 import products.app.zti.service.FileStorageService;
 
 @Controller
@@ -18,6 +20,7 @@ public class AdminProductController {
     private ProductRepository productRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private ImageRepository imageRepository;
 
     // LISTA (index)
     @GetMapping("")
@@ -37,17 +40,25 @@ public class AdminProductController {
     // DODAWANIE (new) - Akcja
     @PostMapping("/new")
     public String saveProduct(@ModelAttribute Product product,
-                              @RequestParam(value = "file", required = false) MultipartFile file) {
+                              @RequestParam(value = "files", required = false) MultipartFile[] files) {
 
-        // Sprawdzamy czy plik w ogóle przyszedł i czy nie jest pusty
-        if (file != null && !file.isEmpty()) {
-            String fileName = fileStorageService.storeFile(file);
-            product.setImageUrl(fileName);
-        } else {
-            // Jeśli nie ma zdjęcia, a to nowy produkt, możemy ustawić null
-            // lub zostawić to, co przyszło z modelu (np. jeśli edytujemy)
-            if (product.getId() == null) {
-                product.setImageUrl(null);
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String fileName = fileStorageService.storeFile(file);
+
+                    // Tworzymy rekord w nowym MODULE MOCY (tabela Image)
+                    Image img = new Image();
+                    img.setUrl(fileName);
+                    product.addImage(img); // Nasz helper spina relację
+
+                    // Tymczasowy fallback: jeśli produkt nie ma jeszcze imageUrl,
+                    // ustawiamy pierwszy wgrany plik jako główny
+                    if (product.getImageUrl() == null) {
+                        product.setImageUrl(fileName);
+                        img.setMain(true);
+                    }
+                }
             }
         }
 
@@ -69,42 +80,61 @@ public class AdminProductController {
     public String delete(@PathVariable Long id) {
         Product product = productRepository.findById(id).orElseThrow();
 
+        // 1. Czyścimy pliki z nowej galerii
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            for (Image img : product.getImages()) {
+                fileStorageService.deleteFile(img.getUrl());
+            }
+        }
+
+        // 2. Czyścimy stare zdjęcie główne (póki istnieje pole imageUrl)
         if (product.getImageUrl() != null) {
             fileStorageService.deleteFile(product.getImageUrl());
         }
 
-        productRepository.deleteById(id);
+        // 3. Usuwamy z bazy (CascadeType.ALL usunie rekordy w tabeli Image)
+        productRepository.delete(product);
+
         return "redirect:/admin/product";
     }
 
     @PostMapping("/{id}/edit")
     public String update(@PathVariable Long id,
                          @ModelAttribute Product product,
-                         @RequestParam(value = "file", required = false) MultipartFile file) {
+                         @RequestParam(value = "files", required = false) MultipartFile[] files) {
 
-        // 1. Pobierz aktualną wersję produktu z bazy
+        // 1. Pobieramy istniejący produkt (MODUŁ MOCY)
         Product existingProduct = productRepository.findById(id).orElseThrow();
 
-        // 2. Obsługa zdjęcia
-        if (file != null && !file.isEmpty()) {
-            // USUŃ STARE ZDJĘCIE PRZED ZAPISANIEM NOWEGO
-            if (existingProduct.getImageUrl() != null) {
-                fileStorageService.deleteFile(existingProduct.getImageUrl());
+        // 2. Aktualizujemy podstawowe dane
+        existingProduct.setName(product.getName());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setStockQuantity(product.getStockQuantity());
+        existingProduct.setCategory(product.getCategory());
+        existingProduct.setDescription(product.getDescription());
+        // imageUrl na razie zostawiamy w spokoju, żeby widoki działały
+
+        // 3. Obsługa wielu nowych zdjęć
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    // Zapisujemy plik na dysku przez Twój serwis
+                    String fileName = fileStorageService.storeFile(file);
+
+                    // Tworzymy obiekt nowej encji Image
+                    Image newImage = new Image();
+                    newImage.setUrl(fileName);
+
+                    // Używamy helpera addImage, który spina relację
+                    existingProduct.addImage(newImage);
+                }
             }
-
-            String fileName = fileStorageService.storeFile(file); // Zapisz nowy plik na dysku
-            product.setImageUrl(fileName);                        // Ustaw nową nazwę w obiekcie
-
-        } else {
-            // Jeśli nie wrzucono nowego pliku, zachowaj starą ścieżkę z bazy
-            product.setImageUrl(existingProduct.getImageUrl());
         }
 
-        // Upewniamy się, że ID jest poprawne, aby Hibernate zrobił UPDATE zamiast INSERT
-        product.setId(id);
-        productRepository.save(product);
+        // 4. Zapisujemy wszystko (CascadeType.ALL zadba o zapisanie nowych obiektów Image)
+        productRepository.save(existingProduct);
 
-        return "redirect:/admin/product";
+        return "redirect:/admin/product/" + id + "/edit";
     }
     @PostMapping("/{id}/delete-image")
     public String deleteImage(@PathVariable Long id) {
@@ -120,6 +150,28 @@ public class AdminProductController {
         productRepository.save(product);
 
         return "redirect:/admin/product/" + id + "/edit";
+    }
+
+    @PostMapping("/image/set-main/{imageId}")
+    public String setMainImage(@PathVariable Long imageId) {
+        // 1. Pobieramy zdjęcie
+        Image selectedImage = this.imageRepository.findById(imageId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid image Id:" + imageId));
+
+        Product product = selectedImage.getProduct();
+
+        // 2. Logika "MODUŁU MOCY": tylko jedno zdjęcie może być główne
+        product.getImages().forEach(img -> {
+            img.setMain(img.getId().equals(imageId));
+        });
+
+        // 3. Synchronizacja ze starym polem imageUrl
+        product.setImageUrl(selectedImage.getUrl());
+
+        // 4. Zapisujemy zmiany
+        productRepository.save(product);
+
+        return "redirect:/admin/product/" + product.getId() + "/edit";
     }
 
 }
