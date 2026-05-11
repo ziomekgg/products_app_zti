@@ -4,25 +4,34 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import products.app.zti.model.Reservation;
 import products.app.zti.model.User;
+import products.app.zti.repository.ReservationRepository;
 import products.app.zti.repository.UserRepository;
 import products.app.zti.service.UserService;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
     private final UserService userService;
 
     @GetMapping
     public String showProfile(Model model, Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika"));
+
+        List<Reservation> orders = reservationRepository.findByUserIdAndStatus(user.getId(), "ORDERED");
+
         model.addAttribute("user", user);
+        model.addAttribute("orders", orders);
         return "profile";
     }
+
 
     @PostMapping("/update-email")
     public String updateEmail(@RequestParam String email, Principal principal) {

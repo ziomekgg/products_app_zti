@@ -21,4 +21,8 @@ public class Reservation {
 
     private int quantity;
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private String status = "IN_CART"; // Domyślnie każdy nowy wpis to koszyk
+
+    private String storeLocation;
 }

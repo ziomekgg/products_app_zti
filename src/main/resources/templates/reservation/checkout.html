@@ -1,9 +1,22 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
 <head>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
 <main class="max-w-7xl mx-auto px-4 py-16">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    .leaflet-container {
+      z-index: 1 !important;
+      border-radius: 2rem;
+    }
+    /* Fix dla brakujących kafli na niektórych przeglądarkach */
+    .leaflet-tile-container {
+      will-change: transform;
+    }
+  </style>
+
   <div class="mb-12 text-center">
     <h1 class="text-5xl font-black text-gray-900 uppercase tracking-tighter">Punkt Odbioru</h1>
     <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Wybierz lokalizację, w której odbierzesz podzespoły</p>
@@ -11,62 +24,96 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
     <div class="lg:col-span-1 space-y-4">
-      <div onclick="selectStore(50.067, 19.913, 'Magazyn Główny - Reymonta')"
+      <div onclick="selectStore(50.067, 19.913, 'Magazyn Główny - Reymonta', this)"
            class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
         <h3 class="font-black uppercase tracking-tight text-gray-900">Magazyn Główny</h3>
         <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Reymonta 17, Kraków</p>
       </div>
 
-      <div onclick="selectStore(50.064, 19.923, 'Punkt Serwisowy - Czarnowiejska')"
+      <div onclick="selectStore(50.064, 19.923, 'Punkt Serwisowy - Czarnowiejska', this)"
            class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
         <h3 class="font-black uppercase tracking-tight text-gray-900">Punkt Serwisowy</h3>
         <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Czarnowiejska, Kraków</p>
       </div>
 
-      <div onclick="selectStore(50.061, 19.937, 'Hub Logistyczny - Centrum')"
+      <div onclick="selectStore(50.061, 19.937, 'Hub Logistyczny - Centrum', this)"
            class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
         <h3 class="font-black uppercase tracking-tight text-gray-900">Hub Logistyczny</h3>
         <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Karmelicka, Kraków</p>
       </div>
 
-      <div class="mt-8 flex justify-end">
+      <div class="mt-8 pt-8 border-t border-gray-100">
         <form th:action="@{/reservation/finalize}" method="POST" id="finalize-form">
-          <input type="hidden" name="storeLocation" id="selected-store-input">
+          <input type="hidden" name="storeLocation" id="selected-store-input" required>
 
           <button type="submit" id="submit-btn" disabled
-                  class="w-full bg-gray-900 text-white font-black py-6 rounded-2xl ...">
+                  class="w-full bg-gray-900 text-white font-black uppercase text-[12px] tracking-[0.2em] py-6 rounded-2xl shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-600 active:scale-95">
             Potwierdzam odbiór w tym punkcie
           </button>
         </form>
+        <p class="text-[9px] text-gray-400 font-bold uppercase text-center mt-4 tracking-widest">Wiadomość z potwierdzeniem zostanie wysłana automatycznie</p>
       </div>
-      </form>
     </div>
 
-    <div class="lg:col-span-2 h-[600px] rounded-[3rem] overflow-hidden border border-gray-100 shadow-inner" id="map"></div>
+    <div class="lg:col-span-2 h-[600px] rounded-[3rem] overflow-hidden border border-gray-100 shadow-2xl relative" id="map-container">
+      <div id="map" class="w-full h-full"></div>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([50.064, 19.923], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // 1. Inicjalizacja instancji mapy
+    const map = L.map('map', {
+      zoomControl: false // Usuwamy domyślne przyciski dla czystszego UI
+    }).setView([50.064, 19.923], 14);
 
+    // 2. Dodanie warstwy kafli (Tiles)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3. Konfiguracja markerów
     const markers = {
       'Magazyn Główny - Reymonta': L.marker([50.067, 19.913]).addTo(map),
       'Punkt Serwisowy - Czarnowiejska': L.marker([50.064, 19.923]).addTo(map),
       'Hub Logistyczny - Centrum': L.marker([50.061, 19.937]).addTo(map)
     };
 
-    function selectStore(lat, lng, name) {
-      map.flyTo([lat, lng], 16);
+    // 4. Funkcja obsługująca wybór punktu
+    function selectStore(lat, lng, name, element) {
+      // Animacja przesunięcia mapy
+      map.flyTo([lat, lng], 16, {
+        duration: 1.5
+      });
+
+      // Przekazanie danych do formularza
       document.getElementById('selected-store-input').value = name;
       document.getElementById('submit-btn').disabled = false;
 
-      // Wizualny feedback dla kart
-      document.querySelectorAll('.store-card').forEach(c => c.classList.remove('border-indigo-600', 'bg-indigo-50'));
-      event.currentTarget.classList.add('border-indigo-600', 'bg-indigo-50');
+      // Feedback wizualny dla kart (UI)
+      document.querySelectorAll('.store-card').forEach(card => {
+        card.classList.remove('border-indigo-600', 'bg-indigo-50', 'shadow-md');
+        card.classList.add('border-gray-100', 'bg-white');
+      });
+      element.classList.remove('border-gray-100', 'bg-white');
+      element.classList.add('border-indigo-600', 'bg-indigo-50', 'shadow-md');
 
-      markers[name].openPopup().bindPopup(`<b>${name}</b>`).openPopup();
+      // Otwarcie popupu na mapie
+      markers[name].bindPopup(`<b style="font-family:sans-serif;">${name}</b>`).openPopup();
     }
+
+    // 5. KLUCZOWY FIX: Przeliczenie rozmiaru mapy po załadowaniu DOM
+    // Zapobiega błędnemu wyświetlaniu kafli (szachownica/szare pola)
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        map.invalidateSize();
+      }, 500);
+    });
+
+    // Dodatkowe przeliczenie przy pełnym załadowaniu okna
+    window.onload = function() {
+      map.invalidateSize();
+    };
   </script>
 </main>
 </body>

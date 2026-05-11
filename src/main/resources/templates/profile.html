@@ -78,6 +78,52 @@
   <div th:if="${param.success}" class="mt-8 p-4 bg-green-50 text-green-700 rounded-2xl text-center font-bold text-sm">
     Zmiany w Module Sterowania zostały zapisane pomyślnie!
   </div>
+  <div class="mt-12 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+    <h2 class="text-xl font-bold mb-8 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+      Historia Rezerwacji
+    </h2>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="text-center py-12">
+      <p class="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Brak sfinalizowanych rezerwacji</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(orders)}" class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+        <tr class="border-b border-gray-50">
+          <th class="pb-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Produkt</th>
+          <th class="pb-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Ilość</th>
+          <th class="pb-4 text-[10px] font-black uppercase text-gray-400 tracking-widest">Punkt Odbioru</th>
+          <th class="pb-4 text-[10px] font-black uppercase text-gray-400 tracking-widest text-right">Suma</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+        <tr th:each="order : ${orders}" class="group">
+          <td class="py-6">
+            <div class="font-bold text-gray-900" th:text="${order.product.name}">Procesor</div>
+            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-tight" th:text="${order.product.category.name}">Podzespół</div>
+          </td>
+          <td class="py-6 font-bold text-gray-600" th:text="${order.quantity + ' szt.'}">1 szt.</td>
+          <td class="py-6">
+              <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-tighter">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                <span th:text="${order.storeLocation}">Magazyn</span>
+              </span>
+          </td>
+          <td class="py-6 text-right font-black text-gray-900"
+              th:text="${#numbers.formatDecimal(order.product.price * order.quantity, 1, 2) + ' PLN'}">
+            0.00 PLN
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </main>
 </body>
 </html>

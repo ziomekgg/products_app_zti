@@ -31,9 +31,9 @@ public class ReservationController {
         if (principal == null) return "redirect:/login";
 
         User user = userRepository.findByEmail(principal.getName()).get();
-        List<Reservation> reservations = reservationRepository.findByUserId(user.getId());
+        // POBIERAMY TYLKO TO, CO JEST W KOSZYKU
+        List<Reservation> reservations = reservationRepository.findByUserIdAndStatus(user.getId(), "IN_CART");
 
-        // Obliczamy sumę zamówienia
         double total = reservations.stream()
                 .mapToDouble(r -> r.getProduct().getPrice() * r.getQuantity())
                 .sum();
@@ -67,16 +67,20 @@ public class ReservationController {
     @PostMapping("/finalize")
     public String finalizeReservation(@RequestParam String storeLocation, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
-        List<Reservation> reservations = reservationRepository.findByUserId(user.getId());
+        // Pobieramy aktualny koszyk
+        List<Reservation> reservations = reservationRepository.findByUserIdAndStatus(user.getId(), "IN_CART");
 
         if (reservations.isEmpty()) return "redirect:/product";
 
-        // 1. Wysyłamy e-mail (asynchronicznie najlepiej, ale tu zrobimy prosto)
+        // 1. Wysyłka maila (dane pobrane z bazy zanim je zmienimy)
         emailService.sendConfirmationEmail(user.getEmail(), storeLocation, reservations);
 
-        // 2. Czyścimy rezerwacje (użytkownik już je "zamówił")
-        // UWAGA: Stan magazynowy został już zmniejszony przy dodawaniu do koszyka!
-        reservationRepository.deleteAll(reservations);
+        // 2. ARCHIWIZACJA: Zmieniamy status zamiast kasować
+        for (Reservation res : reservations) {
+            res.setStatus("ORDERED");
+            res.setStoreLocation(storeLocation);
+        }
+        reservationRepository.saveAll(reservations);
 
         return "redirect:/?success_order";
     }
