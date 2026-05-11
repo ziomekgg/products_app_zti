@@ -9,4 +9,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // Odpowiednik findBy... z Symfony
     List<Product> findByCategoryId(Long categoryId);
+    //szukamy max 8 wyników
+    List<Product> findTop8ByNameContainingIgnoreCase(String name);
+
 }

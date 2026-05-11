@@ -8,6 +8,8 @@ import products.app.zti.model.Product;
 import products.app.zti.repository.ProductRepository;
 import products.app.zti.repository.FavouriteRepository;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/product")
 public class ProductController {
@@ -17,19 +19,18 @@ public class ProductController {
 
     @GetMapping("")
     public String index(Model model) {
-        // Pobieramy produkty - zdjęcia załadują się automatycznie w widoku
-        // dzięki relacji OneToMany (domyślnie Lazy, ale w pętli zadziała)
+        // Pobieramy produkty
         model.addAttribute("products", productRepository.findAll());
         return "product/index";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
-        // 1. Pobierasz produkt
+        // pobranie produktu
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produkt nie istnieje"));
 
-        // 2. To jest ten "bezpiecznik" - dotykasz listy, żeby Hibernate ją pobrał teraz
+        //zmuszenie do wczytania
         if (product.getImages() != null) {
             product.getImages().size();
         }
@@ -40,9 +41,21 @@ public class ProductController {
 
     @PostMapping("/{id}/favourite")
     public String toggleFavourite(@PathVariable Long id) {
-        // Tutaj w przyszłości dodasz logikę sprawdzającą zalogowanego Usera
-        // Na razie zostawiamy redirect, żeby przycisk nie wywalał błędu 404
         return "redirect:/product/" + id;
     }
+
+    @GetMapping("/api/products/search")
+    @ResponseBody // zwracamy JSON
+    public List<ProductSearchDTO> searchApi(@RequestParam String query) {
+        if (query.length() < 2) return List.of(); // Szukamy dopiero od 2 liter
+
+        return productRepository.findTop8ByNameContainingIgnoreCase(query)
+                .stream()
+                .map(p -> new ProductSearchDTO(p.getId(), p.getName(), p.getImageUrl(), p.getPrice()))
+                .toList();
+    }
+
+    // Prosty rekord pomocniczy
+    public record ProductSearchDTO(Long id, String name, String imageUrl, Double price) {}
 
 }
