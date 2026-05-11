@@ -1,155 +1,132 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Edytuj Produkt</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-10">
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Edycja Produktu</h1>
-    <a th:href="@{/admin/product}" class="text-gray-500 hover:underline text-sm">Anuluj</a>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-7xl mx-auto px-4 py-16">
+
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-6">
+    <div>
+      <a th:href="@{/admin/product}" class="text-[10px] font-black uppercase text-indigo-600 tracking-[0.2em] hover:text-gray-900 transition">
+        &larr; Powrót do Magazynu
+      </a>
+      <h1 class="text-4xl font-black text-gray-900 uppercase tracking-tighter mt-2">Modyfikacja Modułu</h1>
+      <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-1">
+        Parametry sprzętowe dla: <span class="text-indigo-600" th:text="${product.name}">Nazwa</span>
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-100 px-6 py-3 rounded-2xl border border-gray-200">
+      <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+      <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Tryb Serwisowy Aktywny</span>
+    </div>
   </div>
 
-  <!-- GŁÓWNY FORMULARZ EDYCJI -->
-  <form id="edit-product-form" th:action="@{/admin/product/{id}/edit(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data" class="space-y-4">
+  <form id="edit-product-form" th:action="@{/admin/product/{id}/edit(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Nazwa produktu</label>
-      <input type="text" th:field="*{name}" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-    </div>
+      <div class="lg:col-span-2 space-y-8">
+        <div class="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100 space-y-8">
 
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Cena (PLN)</label>
-        <input type="number" step="0.01" th:field="*{price}" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm" required>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Stan magazynowy</label>
-        <input type="number" th:field="*{stockQuantity}" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm" required>
-      </div>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Kategoria</label>
-      <select th:field="*{category}" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm">
-        <option th:each="cat : ${categories}"
-                th:value="${cat.id}"
-                th:text="${cat.name}">Kategoria</option>
-      </select>
-    </div>
-
-    <!-- SEKCJA GALERII ZDJĘĆ -->
-    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-      <label class="block text-sm font-bold text-gray-700 mb-4">Galeria zdjęć</label>
-
-      <!-- Siatka istniejących zdjęć -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-        <div th:each="img : ${product.images}" class="relative group border-2 rounded-lg overflow-hidden bg-white shadow-sm transition flex flex-col"
-             th:classappend="${img.url == product.imageUrl} ? 'border-yellow-400 ring-2 ring-yellow-100' : 'border-gray-100'">
-
-          <!-- Kontener zdjęcia -->
-          <div class="relative h-28 w-full overflow-hidden">
-            <img th:src="@{'/uploads/' + ${img.url}}" class="w-full h-full object-cover">
-
-            <!-- Badge "Główne" widoczny na samym zdjęciu -->
-            <span th:if="${img.url == product.imageUrl}"
-                  class="absolute top-1 left-1 bg-yellow-400 text-yellow-900 text-[9px] px-2 py-0.5 rounded font-bold uppercase z-10 shadow-sm">
-              Główne
-            </span>
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">Nazwa Produktu / Modelu</label>
+            <input type="text" th:field="*{name}" class="w-full bg-gray-50 border-transparent rounded-[1.5rem] p-5 text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100" required>
           </div>
 
-          <!-- PASEK AKCJI POD ZDJĘCIEM -->
-          <div class="flex justify-between items-center p-2 bg-white border-t border-gray-50">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">Cena Jednostkowa (PLN)</label>
+              <input type="number" step="0.01" th:field="*{price}" class="w-full bg-gray-50 border-transparent rounded-[1.5rem] p-5 text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100" required>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">Stan Magazynowy (Szt.)</label>
+              <input type="number" th:field="*{stockQuantity}" class="w-full bg-gray-50 border-transparent rounded-[1.5rem] p-5 text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100" required>
+            </div>
+          </div>
 
-            <!-- GWIAZDKA (Ustaw jako główne) -->
-            <button type="submit" th:form="'set-main-' + ${img.id}" class="transition-transform hover:scale-110 focus:outline-none">
-              <!-- Gwiazdka wypełniona (Główne) -->
-              <svg th:if="${img.url == product.imageUrl}" class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-              </svg>
-              <!-- Gwiazdka pusta (Zwykłe) -->
-              <svg th:if="${img.url != product.imageUrl}" class="w-6 h-6 text-gray-300 hover:text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-              </svg>
-            </button>
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">Segment / Kategoria</label>
+            <select th:field="*{category}" class="w-full bg-gray-50 border-transparent rounded-[1.5rem] p-5 text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100 appearance-none">
+              <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Kategoria</option>
+            </select>
+          </div>
 
-            <!-- KOSZ (Usuwanie) -->
-            <button type="submit" th:form="'delete-image-' + ${img.id}" class="text-gray-300 hover:text-red-500 transition"
-                    onclick="return confirm('Usunąć to zdjęcie z galerii?')">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">Specyfikacja / Opis</label>
+            <textarea th:field="*{description}" rows="6" class="w-full bg-gray-50 border-transparent rounded-[2rem] p-6 text-gray-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100"></textarea>
           </div>
         </div>
       </div>
 
-      <div class="border-t border-gray-200 pt-4">
-        <label class="block text-sm font-medium text-gray-700">Dodaj nowe zdjęcia</label>
-        <input type="file" id="image-input" name="files" multiple accept="image/*"
-               onchange="previewMultipleImages(event)"
-               class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+      <div class="lg:col-span-1 space-y-8">
+        <div class="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100">
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 ml-2">Galeria Obrazów</label>
 
-        <div id="new-images-preview" class="grid grid-cols-4 gap-2 mt-4"></div>
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div th:each="img : ${product.images}" class="relative group aspect-square rounded-[1.5rem] overflow-hidden border-2 transition-all shadow-sm"
+                 th:classappend="${img.url == product.imageUrl} ? 'border-yellow-400 ring-4 ring-yellow-50' : 'border-gray-50'">
+
+              <img th:src="@{'/uploads/' + ${img.url}}" class="w-full h-full object-cover">
+
+              <div class="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                <button type="submit" th:form="'set-main-' + ${img.id}" class="bg-white p-2 rounded-full text-yellow-500 hover:scale-110 transition shadow-lg">
+                  <svg th:if="${img.url == product.imageUrl}" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  <svg th:if="${img.url != product.imageUrl}" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </button>
+                <button type="submit" th:form="'delete-image-' + ${img.id}" class="bg-white p-2 rounded-full text-red-500 hover:scale-110 transition shadow-lg" onclick="return confirm('Usunąć?')">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-100 pt-8">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Dodaj Nowe Sygnały (JPG/PNG)</label>
+            <input type="file" name="files" multiple accept="image/*" onchange="previewMultipleImages(event)"
+                   class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-gray-100 file:text-gray-900 hover:file:bg-indigo-600 hover:file:text-white transition-all cursor-pointer">
+            <div id="new-images-preview" class="grid grid-cols-3 gap-2 mt-6"></div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <button type="submit" class="w-full bg-gray-900 hover:bg-indigo-600 text-white font-black uppercase text-[12px] tracking-[0.2em] py-6 rounded-[2rem] shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Zatwierdź Zmiany
+          </button>
+
+          <a th:href="@{/admin/product}"
+             class="w-full bg-gray-100 hover:bg-gray-200 text-gray-500 font-black uppercase text-[11px] tracking-widest py-5 rounded-[1.5rem] transition-all active:scale-95 flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+            </svg>
+            Zakończ edycję i wróć
+          </a>
+        </div>
       </div>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Opis produktu</label>
-      <textarea th:field="*{description}" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"></textarea>
-    </div>
-
-    <div class="pt-6">
-      <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
-        Zapisz wszystkie zmiany
-      </button>
-
-      <a th:href="@{/admin/product}"
-         class="w-full block text-center bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-300 transition">
-        Zakończ edycję i wróć do listy
-      </a>
     </div>
   </form>
 
-  <!-- FORMULARZE POMOCNICZE (UKRYTE) -->
   <div th:each="img : ${product.images}">
-    <!-- Formularz usuwania -->
-    <form th:id="'delete-image-' + ${img.id}"
-          th:action="@{/admin/product/image/delete/{imageId}(imageId=${img.id})}"
-          method="post" class="hidden"></form>
-
-    <!-- Formularz ustawiania jako główne -->
-    <form th:id="'set-main-' + ${img.id}"
-          th:action="@{/admin/product/image/set-main/{imageId}(imageId=${img.id})}"
-          method="post" class="hidden"></form>
+    <form th:id="'delete-image-' + ${img.id}" th:action="@{/admin/product/image/delete/{imageId}(imageId=${img.id})}" method="post" class="hidden"></form>
+    <form th:id="'set-main-' + ${img.id}" th:action="@{/admin/product/image/set-main/{imageId}(imageId=${img.id})}" method="post" class="hidden"></form>
   </div>
 
-</div>
-
-<script>
-  function previewMultipleImages(event) {
-    const previewContainer = document.getElementById('new-images-preview');
-    previewContainer.innerHTML = '';
-
-    const files = event.target.files;
-
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      const file = files[i];
-
-      reader.onload = function(e) {
-        const div = document.createElement('div');
-        div.className = "relative border rounded overflow-hidden shadow-sm";
-        div.innerHTML = `<img src="${e.target.result}" class="w-full h-20 object-cover">
-                         <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[8px] px-1 font-bold uppercase">Nowe</div>`;
-        previewContainer.appendChild(div);
-      };
-      reader.readAsDataURL(file);
+  <script>
+    function previewMultipleImages(event) {
+      const previewContainer = document.getElementById('new-images-preview');
+      previewContainer.innerHTML = '';
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const div = document.createElement('div');
+          div.className = "relative aspect-square rounded-xl overflow-hidden shadow-sm border border-indigo-100";
+          div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover animate-pulse">`;
+          previewContainer.appendChild(div);
+        };
+        reader.readAsDataURL(files[i]);
+      }
     }
-  }
-</script>
-
+  </script>
+</main>
 </body>
 </html>

@@ -1,0 +1,73 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+<main class="max-w-7xl mx-auto px-4 py-16">
+  <div class="mb-12 text-center">
+    <h1 class="text-5xl font-black text-gray-900 uppercase tracking-tighter">Punkt Odbioru</h1>
+    <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Wybierz lokalizację, w której odbierzesz podzespoły</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="lg:col-span-1 space-y-4">
+      <div onclick="selectStore(50.067, 19.913, 'Magazyn Główny - Reymonta')"
+           class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
+        <h3 class="font-black uppercase tracking-tight text-gray-900">Magazyn Główny</h3>
+        <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Reymonta 17, Kraków</p>
+      </div>
+
+      <div onclick="selectStore(50.064, 19.923, 'Punkt Serwisowy - Czarnowiejska')"
+           class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
+        <h3 class="font-black uppercase tracking-tight text-gray-900">Punkt Serwisowy</h3>
+        <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Czarnowiejska, Kraków</p>
+      </div>
+
+      <div onclick="selectStore(50.061, 19.937, 'Hub Logistyczny - Centrum')"
+           class="store-card p-6 bg-white rounded-[2rem] border-2 border-gray-100 cursor-pointer hover:border-indigo-500 transition-all shadow-sm">
+        <h3 class="font-black uppercase tracking-tight text-gray-900">Hub Logistyczny</h3>
+        <p class="text-xs text-gray-400 font-bold uppercase mt-1">ul. Karmelicka, Kraków</p>
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <form th:action="@{/reservation/finalize}" method="POST" id="finalize-form">
+          <input type="hidden" name="storeLocation" id="selected-store-input">
+
+          <button type="submit" id="submit-btn" disabled
+                  class="w-full bg-gray-900 text-white font-black py-6 rounded-2xl ...">
+            Potwierdzam odbiór w tym punkcie
+          </button>
+        </form>
+      </div>
+      </form>
+    </div>
+
+    <div class="lg:col-span-2 h-[600px] rounded-[3rem] overflow-hidden border border-gray-100 shadow-inner" id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([50.064, 19.923], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    const markers = {
+      'Magazyn Główny - Reymonta': L.marker([50.067, 19.913]).addTo(map),
+      'Punkt Serwisowy - Czarnowiejska': L.marker([50.064, 19.923]).addTo(map),
+      'Hub Logistyczny - Centrum': L.marker([50.061, 19.937]).addTo(map)
+    };
+
+    function selectStore(lat, lng, name) {
+      map.flyTo([lat, lng], 16);
+      document.getElementById('selected-store-input').value = name;
+      document.getElementById('submit-btn').disabled = false;
+
+      // Wizualny feedback dla kart
+      document.querySelectorAll('.store-card').forEach(c => c.classList.remove('border-indigo-600', 'bg-indigo-50'));
+      event.currentTarget.classList.add('border-indigo-600', 'bg-indigo-50');
+
+      markers[name].openPopup().bindPopup(`<b>${name}</b>`).openPopup();
+    }
+  </script>
+</main>
+</body>
+</html>

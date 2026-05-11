@@ -88,15 +88,24 @@
         <p class="text-gray-500 text-lg leading-relaxed font-medium" th:text="${product.description}">Opis...</p>
 
         <div class="pt-8 border-t border-gray-100">
-          <form class="space-y-6">
+          <form th:action="@{/reservation/make/{id}(id=${product.id})}" method="POST" class="space-y-6">
+
             <div class="flex flex-col gap-2">
               <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Wybierz ilość</label>
-              <input type="number" value="1" min="1" th:max="${product.stockQuantity}"
+
+              <input type="number"
+                     name="quantity"
+                     value="1"
+                     min="1"
+                     th:max="${product.stockQuantity}"
                      class="w-24 border-2 border-gray-100 rounded-2xl p-4 focus:border-indigo-500 outline-none text-center font-black text-lg transition-colors">
             </div>
-            <button type="submit" th:disabled="${product.stockQuantity <= 0}"
+
+            <button type="submit"
+                    th:disabled="${product.stockQuantity <= 0}"
                     class="w-full bg-gray-900 text-white font-black py-6 rounded-[1.5rem] hover:bg-indigo-600 transition-all shadow-2xl shadow-indigo-100 disabled:bg-gray-200 uppercase tracking-widest text-xs active:scale-[0.98]">
-              Dodaj do koszyka
+              <span th:if="${product.stockQuantity > 0}">Dodaj do koszyka</span>
+              <span th:if="${product.stockQuantity <= 0}">Brak w magazynie</span>
             </button>
           </form>
         </div>

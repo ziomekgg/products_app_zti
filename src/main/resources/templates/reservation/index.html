@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-7xl mx-auto px-4 py-16">
+  <div class="mb-12">
+    <h1 class="text-5xl font-black text-gray-900 uppercase tracking-tighter">Twoja Rezerwacja</h1>
+    <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Lista podzespołów pobranych z magazynu</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="lg:col-span-2 space-y-4">
+      <div th:if="${reservations.isEmpty()}" class="bg-white rounded-[3rem] p-20 text-center border-2 border-dashed border-gray-100">
+        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm">Twój koszyk rezerwacji jest pusty</p>
+        <a th:href="@{/product}" class="inline-block mt-6 text-indigo-600 font-black uppercase text-[11px] tracking-widest hover:text-gray-900 transition">Przejdź do katalogu części &rarr;</a>
+      </div>
+
+      <div th:each="res : ${reservations}" class="bg-white rounded-[2.5rem] p-6 border border-gray-50 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all">
+        <img th:src="@{'/uploads/' + ${res.product.imageUrl}}" class="w-24 h-24 object-cover rounded-2xl border border-gray-100">
+
+        <div class="flex-grow">
+          <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight" th:text="${res.product.name}">Nazwa</h3>
+          <p class="text-indigo-600 font-black" th:text="${res.product.price} + ' PLN / szt.'"></p>
+          <div class="mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Ilość: <span class="text-gray-900" th:text="${res.quantity}">1</span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="text-xl font-black text-gray-900 mb-2" th:text="${res.product.price * res.quantity} + ' PLN'"></div>
+          <form th:action="@{/reservation/remove/{id}(id=${res.id})}" method="post">
+            <button type="submit" class="text-red-500 hover:text-red-700 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-gray-900 rounded-[3rem] p-10 text-white shadow-2xl sticky top-8">
+        <h2 class="text-2xl font-black uppercase tracking-tighter mb-8 border-b border-white/10 pb-4">Status Zamówienia</h2>
+
+        <div class="space-y-4 mb-10">
+          <div class="flex justify-between text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+            <span>Suma części</span>
+            <span th:text="${totalPrice} + ' PLN'">0.00 PLN</span>
+          </div>
+          <div class="flex justify-between text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+            <span>Dostawa</span>
+            <span class="text-green-500">GRATIS (Odbiór AGH)</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-end mb-10">
+          <span class="font-black uppercase text-[11px] tracking-widest">Do zapłaty:</span>
+          <span class="text-4xl font-black leading-none" th:text="${totalPrice} + ' PLN'">0.00</span>
+        </div>
+
+        <a th:href="@{/reservation/checkout}"
+           class="block w-full bg-white text-center text-gray-900 font-black uppercase text-[12px] tracking-[0.2em] py-5 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-xl active:scale-95">
+          Potwierdź Rezerwację
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

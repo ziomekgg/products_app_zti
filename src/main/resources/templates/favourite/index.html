@@ -20,9 +20,11 @@
         <p class="text-indigo-600 font-black text-xl" th:text="${fav.product.price} + ' PLN'"></p>
 
         <div class="flex space-x-2">
-          <form th:action="@{/reservation/add/{id}(id=${fav.product.id})}" method="post">
+          <form th:action="@{/reservation/make/{id}(id=${fav.product.id})}" method="post">
+            <input type="hidden" name="quantity" value="1">
+
             <button type="submit" title="Dodaj do rezerwacji"
-                    class="bg-gray-900 text-white p-3 rounded-xl hover:bg-indigo-600 transition shadow-lg active:scale-95">
+                    class="bg-gray-900 text-white p-3 rounded-xl hover:bg-indigo-600 transition shadow-lg active:scale-95 group">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>

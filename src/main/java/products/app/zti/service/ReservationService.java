@@ -28,7 +28,7 @@ public class ReservationService {
             throw new RuntimeException("Niewystarczająca ilość w magazynie!");
         }
 
-        // Zmniejszamy stan magazynowy (Kluczowe zadanie!)
+        // Zmniejszamy stan magazynowy
         product.setStockQuantity(product.getStockQuantity() - quantity);
         productRepository.save(product);
 
@@ -40,5 +40,18 @@ public class ReservationService {
         reservation.setCreatedAt(LocalDateTime.now());
 
         reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Rezerwacja nie istnieje"));
+
+        // Zwracamy towar do magazynu
+        Product product = reservation.getProduct();
+        product.setStockQuantity(product.getStockQuantity() + reservation.getQuantity());
+        productRepository.save(product);
+
+        reservationRepository.delete(reservation);
     }
 }
