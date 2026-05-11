@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 1. OTWARTE DRZWI
                         .requestMatchers(
-                                "/", "/product/**","/category/**", "/login", "/register", "/uploads/**", "/css/**", "/js/**",
+                                "/","/api/products/**", "/product/**","/category/**", "/login", "/register", "/uploads/**", "/css/**", "/js/**",
                                 "/regulamin", "/polityka-prywatnosci", "/cookies", "/kontakt", "/reklamacje", "/faq" // DODAJ TO
                         ).permitAll()
 
