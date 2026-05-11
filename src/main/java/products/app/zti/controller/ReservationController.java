@@ -2,9 +2,9 @@ package products.app.zti.controller;
 
 import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken; // DODAJ TO
 import products.app.zti.model.Reservation;
 import products.app.zti.model.User;
 import products.app.zti.repository.ReservationRepository;
@@ -15,10 +15,9 @@ import products.app.zti.service.EmailService;
 import java.security.Principal;
 import java.util.List;
 
-
 @Controller
 @RequestMapping("/reservation")
-@RequiredArgsConstructor // Użyj Lombok zamiast @Autowired dla czystości
+@RequiredArgsConstructor
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -26,12 +25,23 @@ public class ReservationController {
     private final UserRepository userRepository;
     private final EmailService emailService;
 
+    // POMOCNICZA METODA DO WYCIĄGANIA MAILA (NASZ KONWERTER)
+    private String getEmailFromPrincipal(Principal principal) {
+        if (principal instanceof OAuth2AuthenticationToken token) {
+            // Logika dla Google - wyciągamy atrybut "email"
+            return token.getPrincipal().getAttribute("email");
+        }
+        // Logika dla zwykłego formularza
+        return principal.getName();
+    }
+
     @GetMapping
     public String index(Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        User user = userRepository.findByEmail(principal.getName()).get();
-        // POBIERAMY TYLKO TO, CO JEST W KOSZYKU
+        String email = getEmailFromPrincipal(principal);
+        User user = userRepository.findByEmail(email).orElseThrow();
+
         List<Reservation> reservations = reservationRepository.findByUserIdAndStatus(user.getId(), "IN_CART");
 
         double total = reservations.stream()
@@ -50,7 +60,8 @@ public class ReservationController {
         if (principal == null) return "redirect:/login";
 
         try {
-            User user = userRepository.findByEmail(principal.getName()).get();
+            String email = getEmailFromPrincipal(principal);
+            User user = userRepository.findByEmail(email).orElseThrow();
             reservationService.reserveProduct(productId, user, quantity);
             return "redirect:/reservation?success";
         } catch (Exception e) {
@@ -66,16 +77,17 @@ public class ReservationController {
 
     @PostMapping("/finalize")
     public String finalizeReservation(@RequestParam String storeLocation, Principal principal) {
-        User user = userRepository.findByEmail(principal.getName()).get();
-        // Pobieramy aktualny koszyk
+        if (principal == null) return "redirect:/login";
+
+        String email = getEmailFromPrincipal(principal);
+        User user = userRepository.findByEmail(email).orElseThrow();
+
         List<Reservation> reservations = reservationRepository.findByUserIdAndStatus(user.getId(), "IN_CART");
 
         if (reservations.isEmpty()) return "redirect:/product";
 
-        // 1. Wysyłka maila (dane pobrane z bazy zanim je zmienimy)
         emailService.sendConfirmationEmail(user.getEmail(), storeLocation, reservations);
 
-        // 2. ARCHIWIZACJA: Zmieniamy status zamiast kasować
         for (Reservation res : reservations) {
             res.setStatus("ORDERED");
             res.setStoreLocation(storeLocation);
@@ -87,8 +99,6 @@ public class ReservationController {
 
     @GetMapping("/checkout")
     public String showCheckoutPage() {
-        // Tu nic nie zapisujemy w bazie.
-        // Po prostu wysyłamy użytkownika do widoku z mapą.
         return "reservation/checkout";
     }
 }

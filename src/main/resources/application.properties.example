@@ -35,3 +35,8 @@ spring.mail.properties.mail.smtp.starttls.required=true
 
 # debugowanie w konsoli
 # spring.mail.properties.mail.debug=true
+
+# Google OAuth2 piny
+spring.security.oauth2.client.registration.google.client-id=TWÓJ_ID_Z_KONSOLI_GOOGLE
+spring.security.oauth2.client.registration.google.client-secret=TWÓJ_KLUCZ_TAJNY
+spring.security.oauth2.client.registration.google.scope=profile,email

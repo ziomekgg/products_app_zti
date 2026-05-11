@@ -1,6 +1,7 @@
 package products.app.zti.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken; // DODAJ TO
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,22 +18,33 @@ public class GlobalControllerAdvice {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
 
+    // Uniwersalna metoda do wyciągania maila z Principal
+    private String getEmailFromPrincipal(Principal principal) {
+        if (principal instanceof OAuth2AuthenticationToken token) {
+            return token.getPrincipal().getAttribute("email");
+        }
+        return principal.getName();
+    }
+
     @ModelAttribute("favCount")
     public long getFavouriteCount(Principal principal) {
-        if (principal == null) return 0; // Jeśli nie ma operatora, licznik = 0
+        if (principal == null) return 0;
 
-        return userRepository.findByEmail(principal.getName())
+        String email = getEmailFromPrincipal(principal);
+
+        return userRepository.findByEmail(email)
                 .map(user -> favouriteRepository.countByUserId(user.getId()))
                 .orElse(0L);
     }
 
     @ModelAttribute
     public void addCartCount(Model model, Principal principal) {
-        int reservationCount = 0;
         if (principal != null) {
-            userRepository.findByEmail(principal.getName()).ifPresent(user -> {
-                // Liczymy sumę ilości wszystkich zarezerwowanych przedmiotów
-                int count = reservationRepository.findByUserId(user.getId())
+            String email = getEmailFromPrincipal(principal);
+
+            userRepository.findByEmail(email).ifPresent(user -> {
+                // Liczymy tylko rezerwacje ze statusem IN_CART (czyli te w koszyku)
+                int count = reservationRepository.findByUserIdAndStatus(user.getId(), "IN_CART")
                         .stream()
                         .mapToInt(r -> r.getQuantity())
                         .sum();

@@ -32,5 +32,5 @@ public class User {
         return Arrays.asList(this.roles.split(","));
     }
 
-
+    private boolean enabled = true;
 }

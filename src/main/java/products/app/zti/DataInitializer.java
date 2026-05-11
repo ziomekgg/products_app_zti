@@ -51,6 +51,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setEmail("admin@test.pl");
             admin.setPassword("admin123"); // Na razie bez kodowania, dopóki nie mamy Security
             admin.setRoles("ROLE_ADMIN");
+            admin.setEnabled(true);
             userRepository.save(admin);
 
             System.out.println(">> DataMock: Rekordy zostały dodane do bazy!");

@@ -29,6 +29,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         // Nadanie domyślnych uprawnień
         user.setRoles("ROLE_USER");
+        user.setEnabled(true);
         return userRepository.save(user);
     }
 }
