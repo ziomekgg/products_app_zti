@@ -1,0 +1,24 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-7xl mx-auto px-4 py-16">
+  <header class="mb-12">
+    <h1 class="text-4xl font-black text-gray-900 uppercase tracking-tighter">Segmenty Sprzętowe</h1>
+    <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em]">Wybierz kategorię podzespołów</p>
+  </header>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <a th:each="category : ${categories}"
+       th:href="@{/category/{id}(id=${category.id})}"
+       class="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-indigo-500 transition-all">
+      <div class="h-12 w-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight" th:text="${category.name}">Kategoria</h3>
+      <p class="text-gray-400 text-xs mt-2 uppercase font-bold tracking-widest">Przejdź do sekcji &rarr;</p>
+    </a>
+  </div>
+</main>
+</body>
+</html>
