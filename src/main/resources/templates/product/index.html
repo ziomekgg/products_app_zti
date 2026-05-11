@@ -1,70 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<section th:replace="~{layout :: main-layout(~{::main})}">
-  <main>
-    <div class="max-w-7xl mx-auto px-4">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main>
+  <div class="max-w-7xl mx-auto px-4">
 
-      <!-- ZMODYFIKOWANY GRID (Mniej kolumn = większe karty) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-12">
-        <div th:each="product : ${products}"
-             class="group bg-white rounded-[4rem] p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 flex flex-col">
-
-          <!-- SEKCJA ZDJĘCIA (Zwiększony padding i zaokrąglenie) -->
-          <div class="relative aspect-square bg-gray-50 rounded-[3rem] overflow-hidden mb-10 shadow-inner">
-            <a th:href="@{/product/{id}(id=${product.id})}">
-              <th:block th:if="${not #lists.isEmpty(product.images)}">
-                <th:block th:each="img : ${product.images}">
-                  <img th:if="${img.isMain}" th:src="@{'/uploads/' + ${img.url}}"
-                       class="w-full h-full object-contain p-12 group-hover:scale-110 transition duration-700" alt="Produkt">
-                </th:block>
-              </th:block>
-
-              <th:block th:if="${#lists.isEmpty(product.images)}">
-                <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
-                     th:src="@{'/uploads/' + ${product.imageUrl}}" class="w-full h-full object-contain p-12" alt="Produkt">
-                <img th:if="${product.imageUrl == null or #strings.isEmpty(product.imageUrl)}"
-                     src="https://via.placeholder.com/600x600?text=Brak+Zdjecia" class="w-full h-full object-contain p-12 opacity-20" alt="Brak">
-              </th:block>
-            </a>
-
-            <span th:if="${product.stockQuantity != null and product.stockQuantity > 0}"
-                  class="absolute top-8 left-8 bg-white/95 text-green-600 text-[11px] font-black px-5 py-2.5 rounded-full shadow-sm uppercase tracking-widest">
-                Dostępny
-            </span>
-          </div>
-
-          <!-- DANE PRODUKTU (Więcej miejsca na tekst) -->
-          <div class="px-4 flex-grow">
-            <div class="flex justify-between items-center mb-4">
-              <p class="text-[12px] font-extrabold text-indigo-500 uppercase tracking-[0.25em]"
-                 th:text="${product.category != null ? product.category.name : 'Elektronika'}"></p>
-              <span class="text-2xl font-black text-gray-900" th:text="${product.price} + ' PLN'"></span>
-            </div>
-
-            <!-- Zwiększony tytuł i brak ucinania tekstu (line-clamp-2 zamiast 1) -->
-            <h3 class="font-bold text-gray-900 text-3xl mb-4 line-clamp-2 tracking-tight leading-tight" th:text="${product.name}"></h3>
-
-            <!-- Dłuższy opis (line-clamp-4 zamiast 2) -->
-            <p class="text-gray-400 text-base mb-10 line-clamp-4 leading-relaxed font-medium" th:text="${product.description}"></p>
-          </div>
-
-          <!-- PRZYCISK AKCJI -->
-          <div class="px-2 pb-2 mt-auto">
-            <a th:href="@{/product/{id}(id=${product.id})}"
-               class="block w-full text-center bg-gray-900 text-white font-black py-6 rounded-[2rem] hover:bg-indigo-600 transition-all shadow-xl active:scale-95 uppercase text-[12px] tracking-widest">
-              Szczegóły produktu
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- PUSTY STAN -->
-      <div th:if="${#lists.isEmpty(products)}" class="text-center py-32 bg-white rounded-[4rem] border-2 border-dashed border-gray-100 mt-10">
-        <h2 class="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tighter">Magazyn jest pusty</h2>
-        <p class="text-gray-500 mb-8 font-medium">Brak komponentów do zasilenia Twojego <span class="uppercase">Modułu Mocy</span>.</p>
-      </div>
-
+    <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-12">
+      <div th:replace="~{product/fragments :: product-list}"></div>
     </div>
-  </main>
-</section>
+
+    <div id="infinite-scroll-sentinel" class="h-20 w-full flex justify-center items-center mt-10">
+      <div class="loader animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full opacity-0 transition-opacity" id="loader"></div>
+    </div>
+
+    <script>
+      let currentPage = 1;
+      const sentinel = document.querySelector('#infinite-scroll-sentinel');
+      const container = document.querySelector('#grid-container');
+      const loader = document.querySelector('#loader');
+      let isFetching = false;
+      let hasMore = true;
+
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isFetching && hasMore) {
+          loadMoreProducts();
+        }
+      }, { rootMargin: '400px' }); // Zwiększamy margines dla płynności
+
+      observer.observe(sentinel);
+
+      async function loadMoreProducts() {
+        isFetching = true;
+        loader.classList.remove('opacity-0');
+
+        try {
+          const response = await fetch(`/api/products/fragment?page=${currentPage}`);
+          const html = await response.text();
+
+          // POPRAWIONY WARUNEK STOPU
+          // Sprawdzamy czy w zwróconym HTML jest klasa 'product-card'
+          if (html.trim() === "" || !html.includes("product-card")) {
+            hasMore = false;
+            observer.unobserve(sentinel);
+            loader.remove();
+            return;
+          }
+
+          container.insertAdjacentHTML('beforeend', html);
+          currentPage++;
+        } catch (error) {
+          console.error("Błąd Modułu Mocy:", error);
+        } finally {
+          isFetching = false;
+          loader.classList.add('opacity-0');
+        }
+      }
+    </script>
+  </div>
+</main>
+</body>
 </html>

@@ -1,6 +1,8 @@
 package products.app.zti.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,4 +46,18 @@ public class ProductController {
         return "redirect:/product/" + id;
     }
 
+    @GetMapping("/api/products/fragment")
+    public String getProductsFragment(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            Model model) {
+
+        // Pobieramy konkretną "paczkę" danych
+        Page<Product> productPage = productRepository.findAll(PageRequest.of(page, size));
+
+        model.addAttribute("products", productPage.getContent());
+
+        // Zwracamy TYLKO fragment pliku (musimy go zaraz stworzyć)
+        return "product/fragments :: product-list";
+    }
 }
