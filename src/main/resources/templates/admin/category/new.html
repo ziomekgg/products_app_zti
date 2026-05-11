@@ -1,23 +1,69 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <title>Nowa Kategoria</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
-  <h1 class="text-2xl font-bold mb-6 text-gray-800">Dodaj nową kategorię</h1>
-  <form th:action="@{/admin/category/new}" method="post" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Nazwa kategorii</label>
-      <input type="text" name="name" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="np. Elektronika" required>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: main-layout(~{::main})}">
+<body>
+<main class="max-w-7xl mx-auto px-4 py-16 flex justify-center">
+
+  <div class="max-w-xl w-full">
+    <div class="mb-10 text-center">
+      <a th:href="@{/admin/category}" class="text-[10px] font-black uppercase text-indigo-600 tracking-[0.2em] hover:text-gray-900 transition">
+        &larr; Powrót do struktury
+      </a>
+      <h1 class="text-4xl font-black text-gray-900 uppercase tracking-tighter mt-4">
+        Nowy Segment
+      </h1>
+      <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-1">
+        Definiujesz nowy węzeł w magazynie części
+      </p>
     </div>
-    <div class="flex gap-4 pt-4">
-      <a th:href="@{/templates/admin/category}" class="flex-1 text-center py-3 text-gray-500 hover:bg-gray-50 rounded-lg transition">Anuluj</a>
-      <button type="submit" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 shadow-md transition">Zapisz</button>
+
+    <div class="bg-white rounded-[3rem] p-12 shadow-sm border border-gray-100 relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-8 opacity-5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+      </div>
+      <div th:if="${errorMessage}" class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 animate-pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-[11px] font-black uppercase text-red-500 tracking-widest" th:text="${errorMessage}"></span>
+      </div>
+      <form th:action="@{/admin/category/new}" method="post" class="space-y-8 relative z-10">
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">
+            Nazwa nowego modułu
+          </label>
+          <input type="text"
+                 name="name"
+                 placeholder="np. Moduły Sterowania, Czujniki..."
+                 class="w-full bg-gray-50 border-transparent rounded-[1.5rem] p-5 text-gray-900 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all border-2 focus:border-indigo-100"
+                 required>
+        </div>
+
+        <div class="flex flex-col gap-4 pt-4">
+          <button type="submit"
+                  class="w-full bg-gray-900 hover:bg-indigo-600 text-white font-black uppercase text-[11px] tracking-widest py-5 rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Zainstaluj w bazie
+          </button>
+
+          <a th:href="@{/admin/category}"
+             class="w-full text-center py-4 text-gray-400 font-black uppercase text-[10px] tracking-widest hover:text-gray-900 transition">
+            Porzuć operację
+          </a>
+        </div>
+      </form>
     </div>
-  </form>
-</div>
+
+    <div class="mt-8 flex justify-center">
+      <div class="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2">
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Awaiting New Data Input</span>
+      </div>
+    </div>
+  </div>
+
+</main>
 </body>
 </html>

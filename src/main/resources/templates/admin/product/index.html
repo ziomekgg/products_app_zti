@@ -3,19 +3,45 @@
 <section th:replace="~{layout :: main-layout(~{::body})}">
   <body>
   <div class="max-w-7xl mx-auto">
-    <!-- NAGŁÓWEK -->
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
       <div>
-        <h1 class="text-3xl font-black text-gray-900">Magazyn Części</h1>
-        <p class="text-gray-500">Zarządzaj asortymentem i stanami magazynowymi</p>
+        <h1 class="text-4xl font-black text-gray-900 uppercase tracking-tighter">Magazyn Części</h1>
+        <p class="text-gray-500 font-bold uppercase text-[10px] tracking-[0.3em] mt-1">
+          Zarządzaj asortymentem i stanami modułów
+        </p>
       </div>
-      <a th:href="@{/admin/product/new}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-        </svg>
-        Dodaj Nowy Produkt
-      </a>
+
+      <div class="flex flex-wrap gap-3">
+
+        <a th:href="@{/admin/category}"
+           class="bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase text-[11px] tracking-widest py-4 px-6 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          Zarządzaj Kategoriami
+        </a>
+
+        <a th:href="@{/admin/category/new}"
+           class="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[11px] tracking-widest py-4 px-6 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Nowa Kategoria
+        </a>
+
+        <a th:href="@{/admin/product/new}"
+           class="bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[11px] tracking-widest py-4 px-6 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Nowy Produkt
+        </a>
+
+      </div>
     </div>
+
+    <div class="h-[1px] w-full bg-gray-100 mb-10"></div>
+  </div>
 
     <!-- TABELA -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
